@@ -3,6 +3,8 @@
   "regions": ["sin1"],
   "crons": [
     { "path": "/api/jobs/snapshot", "schedule": "0 1 * * *" },
-    { "path": "/api/jobs/rollup", "schedule": "0 19 * * *" }
+    { "path": "/api/jobs/poll", "schedule": "30 15 * * *" },
+    { "path": "/api/jobs/enrich", "schedule": "30 17 * * *" },
+    { "path": "/api/jobs/rollup", "schedule": "0 20 * * *" }
   ]
 }

@@ -1,4 +1,10 @@
+import Link from "next/link";
 import { connection } from "next/server";
+import type { JobStatus } from "@/lib/cron";
+import { artistKey } from "@/lib/plays/keys";
+import { vtName } from "@/lib/vt";
+import { CountUp } from "./count-up";
+import { Cover } from "./cover";
 import type { ReactNode } from "react";
 import { getEntities, type TrackDoc } from "@/lib/entities";
 import { getDb } from "@/lib/firebase/admin";
@@ -77,7 +83,7 @@ export async function HomeTiles() {
     <>
       <Tile label="Hours this week" badge="● live" from="#E4572E" to="#D9667E" icon={<ClockIcon />} delay={260}>
         <p className="font-display tabular mt-1 text-5xl font-bold">
-          {ws ? fmtHours(ws.thisWeekMs) : "–"}
+          {ws ? <CountUp value={Math.round((ws.thisWeekMs / 3_600_000) * 10) / 10} decimals={1} /> : "–"}
           <span className="ml-1 text-2xl text-ink-soft">h</span>
         </p>
         {ws && ws.thisWeekMs === 0 && ws.lastWeekSameSpanMs === 0 ? (
@@ -93,7 +99,7 @@ export async function HomeTiles() {
       </Tile>
       <Tile label="Day streak" badge="● live" from="#E9B44C" to="#E4572E" icon={<FlameIcon />} delay={480}>
         <p className="font-display tabular mt-1 text-5xl font-bold">
-          {ws?.streak ?? 0}
+          <CountUp value={ws?.streak ?? 0} />
           <span className="ml-1 text-2xl text-ink-soft">{ws?.streak === 1 ? "day" : "days"}</span>
         </p>
         <p className="mt-1 text-sm text-ink-soft">
@@ -108,11 +114,10 @@ function ArtistLine({ artist }: { artist: Artist }) {
   const img = artist.images?.at(-1)?.url;
   return (
     <div className="mt-2 flex items-center gap-3">
-      {img && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={img} alt="" className="h-12 w-12 rounded-full object-cover shadow ring-2 ring-white" />
-      )}
-      <p className="font-display min-w-0 flex-1 truncate text-3xl font-bold leading-tight">{artist.name}</p>
+      <Link href={`/artist/${encodeURIComponent(artistKey(artist.name))}`} className="flex min-w-0 flex-1 items-center gap-3 hover:underline">
+        <Cover src={img} vt={vtName("artist", artistKey(artist.name))} round className="h-12 w-12 shadow ring-2 ring-white" />
+        <span className="font-display min-w-0 flex-1 truncate text-3xl font-bold leading-tight">{artist.name}</span>
+      </Link>
       <SpotifyLink href={artist.external_urls?.spotify} />
     </div>
   );
@@ -142,17 +147,12 @@ export async function NowTop5() {
     <ol className="grid gap-3 sm:grid-cols-5">
       {tracks.map((t, i) => (
         <li key={t.id} className="rise tile tile-hover group relative overflow-hidden p-3" style={{ ["--d" as string]: `${i * 70}ms` }}>
-          <div className="relative">
-            {t.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={t.image} alt="" className="aspect-square w-full rounded-2xl object-cover shadow transition-transform duration-500 group-hover:rotate-[-3deg] group-hover:scale-[1.03]" />
-            ) : (
-              <span className="block aspect-square w-full rounded-2xl bg-paper-deep" />
-            )}
+          <Link href={`/track/${t.id}`} className="relative block">
+            <Cover src={t.image} vt={vtName("track", t.id)} className="aspect-square w-full !rounded-2xl shadow transition-transform duration-500 group-hover:rotate-[-3deg] group-hover:scale-[1.03]" />
             <span className="font-display absolute -left-1 -top-1 grid h-10 w-10 place-items-center rounded-full bg-vermilion text-xl font-bold text-ink shadow">
               {i + 1}
             </span>
-          </div>
+          </Link>
           <div className="mt-3 flex items-start gap-1">
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold">{t.name}</p>
@@ -163,6 +163,60 @@ export async function NowTop5() {
         </li>
       ))}
     </ol>
+  );
+}
+
+const JOBS: { key: string; label: string; every: string; staleAfterMs: number }[] = [
+  { key: "poll", label: "Play logger", every: "daily", staleAfterMs: 30 * 60 * 60 * 1000 },
+  { key: "enrich", label: "Genre finder", every: "daily", staleAfterMs: 30 * 60 * 60 * 1000 },
+  { key: "snapshot", label: "Daily snapshot", every: "daily", staleAfterMs: 30 * 60 * 60 * 1000 },
+  { key: "rollup", label: "Nightly rollup", every: "nightly", staleAfterMs: 30 * 60 * 60 * 1000 },
+];
+
+const ago = (ms: number) => {
+  const m = Math.round(ms / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  return h < 48 ? `${h} h ago` : `${Math.round(h / 24)} days ago`;
+};
+
+async function loadJobStatus() {
+  const status = await safely(
+    "job status",
+    async () => (await getDb().doc("config/jobs").get()).data() as Record<string, JobStatus> | undefined,
+  );
+  return { status, now: Date.now() };
+}
+
+/** Behind the scenes: when each background job last ran, and whether it worked. */
+export async function JobsStatus() {
+  await connection();
+  const { status, now } = await loadJobStatus();
+  return (
+    <ul className="grid gap-3 sm:grid-cols-4">
+      {JOBS.map((j) => {
+        const s = status?.[j.key];
+        const state = !s ? "never" : !s.ok ? "failed" : now - s.at > j.staleAfterMs ? "late" : "ok";
+        const dot = { ok: "bg-teal", late: "bg-mustard", failed: "bg-vermilion", never: "bg-ink/20" }[state];
+        return (
+          <li key={j.key} className="tile flex items-start gap-3 p-4">
+            <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dot} ${state === "ok" ? "twinkle" : ""}`} aria-hidden />
+            <div className="min-w-0">
+              <p className="font-semibold">{j.label}</p>
+              <p className="text-xs text-ink-soft">
+                {state === "never" && `Hasn't run yet · ${j.every}`}
+                {state === "ok" && `Ran ${ago(now - s!.at)} · ${j.every}`}
+                {state === "late" && `Last ran ${ago(now - s!.at)}. Is the schedule on?`}
+                {state === "failed" && (
+                  <span title={s!.error}>Failed {ago(now - s!.at)}{s!.lastOkAt ? ` · last OK ${ago(now - s!.lastOkAt)}` : ""}</span>
+                )}
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

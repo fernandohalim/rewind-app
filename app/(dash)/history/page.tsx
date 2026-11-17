@@ -4,8 +4,9 @@ import { Suspense, type ReactNode } from "react";
 import { MonthBars } from "@/components/charts/month-bars";
 import { Cassette, Floater, LoadingTape } from "@/components/decor";
 import { EmptyState, PageHero, SectionTitle } from "@/components/page-hero";
-import { RankList, StatTile } from "@/components/rank-list";
-import { fmtHours, getAllTime, getMonth, getYear, hours, monthAsSummary, nameRows } from "@/lib/stats/read";
+import { CountTile } from "@/components/entity-parts";
+import { RankList } from "@/components/rank-list";
+import { getAllTime, getMonth, getYear, hours, monthAsSummary, nameRows } from "@/lib/stats/read";
 import type { YearDoc } from "@/lib/stats/types";
 import { monthLabel } from "@/lib/time";
 
@@ -45,7 +46,7 @@ async function HistoryContent({ searchParams }: { searchParams: Search }) {
   const allTime = await getAllTime();
   if (!allTime) {
     return (
-      <div className="mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
+      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
         <EmptyState title="The tape is still blank" icon={<Cassette className="w-24" />}>
           Plays are being logged every half hour. Your history appears after the first nightly rollup.
         </EmptyState>
@@ -78,7 +79,7 @@ async function HistoryContent({ searchParams }: { searchParams: Search }) {
   const barsSource = year ? monthsOfYear : allTime.months;
 
   return (
-    <div className="mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
+    <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
       {/* Picker */}
       <div className="tile relative p-4 sm:p-5">
         <div className="flex flex-wrap gap-2">
@@ -107,10 +108,10 @@ async function HistoryContent({ searchParams }: { searchParams: Search }) {
       ) : (
         <>
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <StatTile label={`Hours · ${scopeLabel}`} value={fmtHours(summary.totals.ms)} unit="h" />
-            <StatTile label="Streams" value={summary.totals.count.toLocaleString("en")} delay={60} />
-            <StatTile label="Unique tracks" value={summary.uniqueTracks.toLocaleString("en")} delay={120} />
-            <StatTile label="Unique artists" value={summary.uniqueArtists.toLocaleString("en")} delay={180} />
+            <CountTile key={`h-${scopeLabel}`} label={`Hours · ${scopeLabel}`} value={Math.round(hours(summary.totals.ms) * 10) / 10} decimals={1} unit="h" />
+            <CountTile key={`s-${scopeLabel}`} label="Streams" value={summary.totals.count} delay={60} />
+            <CountTile key={`t-${scopeLabel}`} label="Unique tracks" value={summary.uniqueTracks} delay={120} />
+            <CountTile key={`a-${scopeLabel}`} label="Unique artists" value={summary.uniqueArtists} delay={180} />
           </div>
 
           {!month && barsSource.length > 0 && (

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Heatmap } from "@/components/charts/heatmap";
@@ -42,7 +43,7 @@ async function TimeContent() {
   const allTime = await getAllTime();
   if (!allTime) {
     return (
-      <div className="mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
+      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
         <EmptyState title="The clock hasn't started" icon={<Headphones className="w-20" />}>
           Your listening clock fills in after the first nightly rollup.
         </EmptyState>
@@ -55,7 +56,7 @@ async function TimeContent() {
   const { longest, current } = allTime.streaks;
 
   return (
-    <div className="mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
+    <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
       <section className="tile relative p-5 sm:p-7">
         <h2 className="font-display text-2xl font-bold">Hour × weekday</h2>
         <p className="mt-1 text-sm text-ink-soft">Every stream, by when it ended (Jakarta time).</p>
@@ -126,7 +127,9 @@ async function TimeContent() {
                     <span className="h-10 w-10 rounded-lg bg-paper-deep" />
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{t?.name ?? "Unknown track"}</p>
+                    <Link href={`/track/${b.trackId}`} className="block truncate font-semibold hover:underline">
+                      {t?.name ?? "Unknown track"}
+                    </Link>
                     <p className="truncate text-xs text-ink-soft">
                       {t?.artistName} · {dayLabel(dayKey(b.start))}
                     </p>

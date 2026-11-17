@@ -23,7 +23,12 @@ export type ArtistDoc = {
   spotifyId?: string;
   image?: string;
   url?: string;
-  genres?: string[];
+  mbid?: string | null; // null = looked for and not found
+  tags?: { name: string; weight: number; src: string }[];
+  genres?: string[]; // merged top 5
+  similar?: { name: string; match: number; mbid?: string; url?: string }[];
+  enrichedAt?: number;
+  nextEnrichAt?: number;
 };
 
 const pickImage = (imgs?: { url: string; width?: number | null }[]) =>

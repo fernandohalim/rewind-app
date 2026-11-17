@@ -4,7 +4,8 @@ import type { DayDoc, MonthDoc, Play } from "@/lib/plays/types";
 import { addDays, daysInMonth, monthOf, prevMonth, todayKey, yearOf } from "@/lib/time";
 import { buildMonth } from "./month";
 import { computeStreaks, mergeBinges, scanBinges } from "./streaks";
-import type { AllTimeDoc, Ranked, YearDoc } from "./types";
+import { discovery, diversity, genreByMonth, recentDiscoveries, series } from "./taste";
+import type { AllTimeDoc, Ranked, SeriesDoc, YearDoc } from "./types";
 
 const TOP_N = 200;
 const BINGE_SCAN_MAX_DAYS = 400; // per night; a big backlog finishes over several nights
@@ -128,8 +129,39 @@ export async function rollup() {
     binges = mergeBinges(binges, scan.found);
   }
 
+  // Taste (level 5): primary genre of every enriched artist.
+  const enriched = await db.collection("artists").where("enrichedAt", ">", 0).select("genres").get();
+  const primaryGenre = new Map<string, string>();
+  enriched.docs.forEach((d) => {
+    const g = (d.get("genres") as string[] | undefined)?.[0];
+    if (g) primaryGenre.set(d.id, g);
+  });
+  const taste = genreByMonth(months, primaryGenre);
+  const totalMs = months.reduce((s, m) => s + (m.totals?.ms ?? 0), 0);
+  const taggedMs = taste.genreMonths.reduce((s, g) => s + g.tagged, 0);
+
+  const summary = aggregate("all-time", months);
+
+  // Timelines for the detail pages (top 300 by minutes; small enough for one doc each).
+  const SERIES_N = 300;
+  batch.set(db.doc("stats/series-artists"), {
+    entries: series(months, "artistCount", "artistMs", summary.topArtistsByMs.slice(0, SERIES_N).map((r) => r.id)),
+    builtAt: Date.now(),
+  } satisfies SeriesDoc);
+  batch.set(db.doc("stats/series-tracks"), {
+    entries: series(months, "trackCount", "trackMs", summary.topTracksByMs.slice(0, SERIES_N).map((r) => r.id)),
+    builtAt: Date.now(),
+  } satisfies SeriesDoc);
+
   const allTime: AllTimeDoc = {
-    ...aggregate("all-time", months),
+    ...summary,
+    topGenres: taste.topGenres,
+    genreMonths: taste.genreMonths,
+    eras: taste.eras,
+    diversity: diversity(months, taste.genreEffByMonth),
+    discovery: discovery(months, firstMonth),
+    recentDiscoveries: recentDiscoveries(months, firstMonth),
+    tagCoverage: totalMs ? Math.round((taggedMs / totalMs) * 1000) / 1000 : 0,
     years,
     heat,
     firstMonth,

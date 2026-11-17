@@ -1,13 +1,9 @@
 import { Suspense } from "react";
 import { Cassette, Floater, LoadingTape, Note, Vinyl } from "@/components/decor";
-import { HelloName, HomeTiles, NowTop5, ThisDayYearsAgo, TilesSkeleton } from "@/components/home-live";
+import { HelloName, HomeTiles, JobsStatus, NowTop5, ThisDayYearsAgo, TilesSkeleton } from "@/components/home-live";
 import { PageHero, SectionTitle } from "@/components/page-hero";
 
-const milestones = [
-  { id: "M4", title: "Full import", note: "Every play since your account was created", color: "#2E7D7A" },
-  { id: "M5", title: "Genres", note: "Your eras, discoveries and similar artists", color: "#E9B44C" },
-  { id: "M6", title: "Polish", note: "Artist and track pages, and little surprises", color: "#7B4B94" },
-];
+
 
 export default function Home() {
   return (
@@ -19,7 +15,7 @@ export default function Home() {
             <HelloName />
           </Suspense>
         }
-        subtitle="Your tape is rolling. Every play gets logged, every half hour."
+        subtitle="Your tape is rolling. New plays get logged every day."
         decor={
           <>
             <Floater className="right-[6%] top-20 w-28 sm:right-[12%] sm:w-44" variant="b">
@@ -59,20 +55,14 @@ export default function Home() {
 
       <section className="mx-auto w-full max-w-5xl px-4 py-16">
         <SectionTitle aside={<Cassette className="float-a hidden w-28 sm:block" style={{ ["--r" as string]: "8deg" }} />}>
-          Coming up on the tape
+          Behind the scenes
         </SectionTitle>
-        <ol className="mt-10 grid gap-4 sm:grid-cols-3">
-          {milestones.map((m, i) => (
-            <li key={m.id} className="rise tile tile-hover relative overflow-hidden p-5" style={{ ["--d" as string]: `${i * 90}ms` }}>
-              <span className="absolute inset-x-0 top-0 h-1.5" style={{ background: m.color }} />
-              <span className="grid h-10 w-10 place-items-center rounded-full font-bold text-white" style={{ background: m.color }}>
-                {m.id}
-              </span>
-              <h3 className="font-display mt-4 text-xl font-bold">{m.title}</h3>
-              <p className="mt-1 text-sm text-ink-soft">{m.note}</p>
-            </li>
-          ))}
-        </ol>
+        <p className="mt-4 text-ink-soft">The little machines that keep your tape rolling.</p>
+        <div className="mt-6">
+          <Suspense fallback={<div className="tile h-20 animate-pulse" />}>
+            <JobsStatus />
+          </Suspense>
+        </div>
       </section>
     </main>
   );

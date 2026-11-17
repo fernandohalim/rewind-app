@@ -1,3 +1,5 @@
+import type { Discovery, Diversity, Era, GenreMonth, SeriesEntry } from "./taste";
+
 /** Ranked entry: id is a trackId or artistKey. */
 export type Ranked = { id: string; count: number; ms: number };
 
@@ -27,5 +29,16 @@ export type AllTimeDoc = YearDoc & {
   streaks: { longest: Streak[]; current: Streak | null };
   binges: Binge[];
   bingeScan?: { lastDay: string; carry: Binge | null };
+  // Level 5 (taste)
+  topGenres: string[]; // ≤ 5, fixed colour order
+  genreMonths: GenreMonth[];
+  eras: Era[];
+  diversity: Diversity[];
+  discovery: Discovery[];
+  recentDiscoveries: { key: string; count: number; firstMonth: string }[];
+  tagCoverage: number; // share of all minutes from artists with genres
   rolledUpAt: number;
 };
+
+/** `stats/series-artists` and `stats/series-tracks`: timelines for the top entities. */
+export type SeriesDoc = { entries: Record<string, SeriesEntry>; builtAt: number };

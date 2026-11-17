@@ -10,7 +10,7 @@ const H = 240;
 const PAD = { l: 40, r: 8, t: 16, b: 28 };
 
 /** Single-series bars (hours per month). Grows from the baseline; hover for exact values. */
-export function MonthBars({ bars, unit = "h" }: { bars: Bar[]; unit?: string }) {
+export function MonthBars({ bars, unit = "h", decimals = 1 }: { bars: Bar[]; unit?: string; decimals?: number }) {
   const [hover, setHover] = useState<number | null>(null);
   const max = Math.max(1, ...bars.map((b) => b.value));
   const nice = niceMax(max);
@@ -29,7 +29,7 @@ export function MonthBars({ bars, unit = "h" }: { bars: Bar[]; unit?: string }) 
               <line x1={PAD.l} x2={W - PAD.r} y1={y(nice * f)} y2={y(nice * f)} stroke="#1B1A17" strokeOpacity={f === 0 ? 0.25 : 0.07} />
               <text x={PAD.l - 8} y={y(nice * f) + 4} textAnchor="end" fontSize={11} fill="#5C574F">
                 {Math.round(nice * f)}
-                {unit}
+                {unit === "h" ? unit : ""}
               </text>
             </g>
           ))}
@@ -69,7 +69,7 @@ export function MonthBars({ bars, unit = "h" }: { bars: Bar[]; unit?: string }) 
           >
             <p className="font-semibold">{bars[hover].detail}</p>
             <p className="tabular text-white/75">
-              {bars[hover].value.toFixed(1)} {unit === "h" ? "hours" : unit}
+              {bars[hover].value.toFixed(decimals)} {unit === "h" ? "hours" : unit}
             </p>
           </div>
         )}
@@ -81,7 +81,7 @@ export function MonthBars({ bars, unit = "h" }: { bars: Bar[]; unit?: string }) 
             {bars.map((b) => (
               <tr key={b.key} className="border-t border-ink/10">
                 <td className="py-1 text-ink">{b.detail}</td>
-                <td className="tabular py-1 text-right">{b.value.toFixed(1)} {unit}</td>
+                <td className="tabular py-1 text-right">{b.value.toFixed(decimals)} {unit}</td>
               </tr>
             ))}
           </tbody>

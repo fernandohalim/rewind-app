@@ -6,12 +6,26 @@ import { requireEnv } from "@/lib/spotify/tokens";
 import { SCOPES } from "@/lib/spotify/types";
 
 /** Starts the Spotify Authorization Code flow. */
-export async function GET() {
+export async function GET(request: Request) {
   await connection();
   if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_REDIRECT_URI) {
     return messagePage("Spotify isn't set up yet", [
       { text: "Set SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET and SPOTIFY_REDIRECT_URI in .env.local, then restart the dev server." },
     ], 503);
+  }
+
+  // The login cookie lives on this host, so Spotify must send you back to the
+  // same host. A redirect URI copied from another environment can't work.
+  const here = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  const target = new URL(process.env.SPOTIFY_REDIRECT_URI).host;
+  if (here && here !== target) {
+    const proto = request.headers.get("x-forwarded-proto") ?? (/^(127\.0\.0\.1|localhost)(:|$)/.test(here) ? "http" : "https");
+    return messagePage("Redirect URI points somewhere else", [
+      { text: `You're on ${here}, but SPOTIFY_REDIRECT_URI sends Spotify back to ${target}.` },
+      {
+        html: `Set <code>SPOTIFY_REDIRECT_URI</code> for this environment to <code>${`${proto}://${here}/api/auth/callback`.replace(/[<>&"]/g, "")}</code> (it must also be listed in the Spotify app), then redeploy.`,
+      },
+    ], 500);
   }
   const state = randomBytes(24).toString("base64url");
 

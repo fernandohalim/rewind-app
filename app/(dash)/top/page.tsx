@@ -83,7 +83,7 @@ async function TopContent() {
   } catch (err) {
     console.error("[top] Spotify request failed", err);
     return (
-      <div className="mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
+      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
         <EmptyState title="Spotify didn't answer">Couldn&apos;t load your rankings right now. Try again in a minute.</EmptyState>
       </div>
     );
@@ -95,7 +95,7 @@ async function TopContent() {
   const ins = insights(lists);
 
   return (
-    <div className="mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
+    <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
       <section className="relative">
         <TopBoard lists={lists} movement={movement} since={prev ? dayLabel(prev.date) : null} />
       </section>
