@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+!.env.example
+
+# import checkpoint (M4)
+.import-checkpoint.json
+/.claude

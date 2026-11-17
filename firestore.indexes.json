@@ -1,0 +1,13 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    { "collectionGroup": "stats", "fieldPath": "trackCount", "indexes": [] },
+    { "collectionGroup": "stats", "fieldPath": "trackMs", "indexes": [] },
+    { "collectionGroup": "stats", "fieldPath": "artistCount", "indexes": [] },
+    { "collectionGroup": "stats", "fieldPath": "artistMs", "indexes": [] },
+    { "collectionGroup": "stats", "fieldPath": "heat", "indexes": [] },
+    { "collectionGroup": "stats", "fieldPath": "days", "indexes": [] },
+    { "collectionGroup": "stats", "fieldPath": "skips", "indexes": [] },
+    { "collectionGroup": "plays", "fieldPath": "items", "indexes": [] }
+  ]
+}
