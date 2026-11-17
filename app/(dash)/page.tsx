@@ -15,7 +15,7 @@ export default function Home() {
             <HelloName />
           </Suspense>
         }
-        subtitle="Your tape is rolling. New plays get logged every day."
+        subtitle="Your tape is rolling. Every play gets logged, every half hour."
         decor={
           <>
             <Floater className="right-[6%] top-20 w-28 sm:right-[12%] sm:w-44" variant="b">

@@ -1,10 +1,30 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["sin1"],
-  "crons": [
-    { "path": "/api/jobs/snapshot", "schedule": "0 1 * * *" },
-    { "path": "/api/jobs/poll", "schedule": "30 15 * * *" },
-    { "path": "/api/jobs/enrich", "schedule": "30 17 * * *" },
-    { "path": "/api/jobs/rollup", "schedule": "0 20 * * *" }
-  ]
+  "schedules": {
+    "poll": {
+      "schedule": "*/30 * * * *",
+      "timezone": "Asia/Jakarta",
+      "path": "/api/jobs/poll",
+      "requestMethod": "GET"
+    },
+    "snapshot": {
+      "schedule": "0 8 * * *",
+      "timezone": "Asia/Jakarta",
+      "path": "/api/jobs/snapshot",
+      "requestMethod": "GET"
+    },
+    "enrich": {
+      "schedule": "30 0 * * *",
+      "timezone": "Asia/Jakarta",
+      "path": "/api/jobs/enrich",
+      "requestMethod": "GET"
+    },
+    "rollup": {
+      "schedule": "0 3 * * *",
+      "timezone": "Asia/Jakarta",
+      "path": "/api/jobs/rollup",
+      "requestMethod": "GET"
+    }
+  }
 }

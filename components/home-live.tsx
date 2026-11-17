@@ -167,7 +167,7 @@ export async function NowTop5() {
 }
 
 const JOBS: { key: string; label: string; every: string; staleAfterMs: number }[] = [
-  { key: "poll", label: "Play logger", every: "daily", staleAfterMs: 30 * 60 * 60 * 1000 },
+  { key: "poll", label: "Play logger", every: "every 30 min", staleAfterMs: 2 * 60 * 60 * 1000 },
   { key: "enrich", label: "Genre finder", every: "daily", staleAfterMs: 30 * 60 * 60 * 1000 },
   { key: "snapshot", label: "Daily snapshot", every: "daily", staleAfterMs: 30 * 60 * 60 * 1000 },
   { key: "rollup", label: "Nightly rollup", every: "nightly", staleAfterMs: 30 * 60 * 60 * 1000 },
