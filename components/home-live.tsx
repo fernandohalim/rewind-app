@@ -248,8 +248,11 @@ export async function ThisDayYearsAgo() {
       <div className="tile flex items-center gap-5 p-6">
         <Vinyl className="spin-slow w-16 shrink-0" />
         <p className="text-ink-soft">
-          Nothing from past years yet. Once your full Spotify history is imported, this is where you&apos;ll see what you
-          played on this day, years ago.
+          Nothing from past years yet. Once your{" "}
+          <Link href="/import" className="font-semibold text-vermilion-deep underline">
+            full Spotify history is imported
+          </Link>
+          , this is where you&apos;ll see what you played on this day, years ago.
         </p>
       </div>
     );

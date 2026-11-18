@@ -2,6 +2,7 @@ import { FieldPath } from "firebase-admin/firestore";
 import { getDb } from "@/lib/firebase/admin";
 import type { DayDoc, MonthDoc, Play } from "@/lib/plays/types";
 import { addDays, daysInMonth, monthOf, prevMonth, todayKey, yearOf } from "@/lib/time";
+import { aggregateHabits } from "./habits";
 import { buildMonth } from "./month";
 import { computeStreaks, mergeBinges, scanBinges } from "./streaks";
 import { discovery, diversity, genreByMonth, recentDiscoveries, series } from "./taste";
@@ -162,6 +163,7 @@ export async function rollup() {
     discovery: discovery(months, firstMonth),
     recentDiscoveries: recentDiscoveries(months, firstMonth),
     tagCoverage: totalMs ? Math.round((taggedMs / totalMs) * 1000) / 1000 : 0,
+    ...aggregateHabits(months),
     years,
     heat,
     firstMonth,

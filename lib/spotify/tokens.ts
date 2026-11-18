@@ -5,8 +5,12 @@ const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const REFRESH_EARLY_MS = 5 * 60 * 1000; // refresh 5 minutes before expiry
 const LEASE_MS = 15 * 1000;
 
+/**
+ * Read a required env var, tolerating paste accidents: surrounding whitespace,
+ * newlines and wrapping quotes are removed.
+ */
 export function requireEnv(name: string): string {
-  const v = process.env[name];
+  const v = (process.env[name] ?? "").trim().replace(/^(['"])(.*)\1$/, "$2").trim();
   if (!v) throw new Error(`${name} is not set`);
   return v;
 }

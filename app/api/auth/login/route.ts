@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   // The login cookie lives on this host, so Spotify must send you back to the
   // same host. A redirect URI copied from another environment can't work.
   const here = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-  const target = new URL(process.env.SPOTIFY_REDIRECT_URI).host;
+  const target = new URL(requireEnv("SPOTIFY_REDIRECT_URI")).host;
   if (here && here !== target) {
     const proto = request.headers.get("x-forwarded-proto") ?? (/^(127\.0\.0\.1|localhost)(:|$)/.test(here) ? "http" : "https");
     return messagePage("Redirect URI points somewhere else", [

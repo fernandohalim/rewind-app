@@ -14,7 +14,7 @@ const RETRY_HIT = 90 * DAY;
 const RETRY_MISS = 30 * DAY;
 // Runs once a day, so take as much as the time budget allows; the loop below
 // stops picking new work when time runs low (MusicBrainz is ~1 call/s).
-const TRACKS_PER_RUN = 100;
+const TRACKS_PER_RUN = 300; // export stubs; single lookups are quick, capped at half the time budget
 const ARTISTS_PER_RUN = 40;
 const SCAN_PAGE = 200;
 
@@ -34,7 +34,7 @@ export async function enrich(budgetMs = 240_000) {
   const result = { tracksResolved: 0, artistsEnriched: 0, artistMisses: 0, imagesAdded: 0, stoppedEarly: false };
 
   // 1. Track stubs: priority from all-time minutes, then any other stub.
-  const priority = (allTime?.topTracksByMs ?? []).slice(0, 100).map((r) => r.id);
+  const priority = (allTime?.topTracksByMs ?? []).slice(0, 200).map((r) => r.id);
   const known = await getEntities<TrackDoc>("tracks", priority);
   const stubIds = new Set(priority.filter((id) => known.get(id)?.metaSource === "export-stub"));
   if (stubIds.size < TRACKS_PER_RUN) {
@@ -42,7 +42,8 @@ export async function enrich(budgetMs = 240_000) {
     more.docs.forEach((d) => stubIds.add(d.id));
   }
   for (const id of [...stubIds].slice(0, TRACKS_PER_RUN)) {
-    if (timeLeft() < 60_000) {
+    if (timeLeft() < budgetMs / 2) {
+      // Leave the other half of the run for artist enrichment.
       result.stoppedEarly = true;
       break;
     }
@@ -63,8 +64,11 @@ export async function enrich(budgetMs = 240_000) {
 
   // 2. Artists: top artists by minutes first, then a rolling scan of the whole collection.
   const now = Date.now();
+  // `similar` is only written once Last.fm has been asked, so artists enriched
+  // before LASTFM_API_KEY existed are picked up again as soon as it's set.
+  const lastfmPending = (a: ArtistDoc) => lastfmEnabled() && a.similar === undefined;
   const needs = (a: ArtistDoc | undefined) =>
-    !!a && (!a.nextEnrichAt || a.nextEnrichAt < now || (!a.image && !!a.spotifyId));
+    !!a && (!a.nextEnrichAt || a.nextEnrichAt < now || (!a.image && !!a.spotifyId) || lastfmPending(a));
   const candidates = new Map<string, ArtistDoc>();
   const topKeys = (allTime?.topArtistsByMs ?? []).slice(0, 60).map((r) => r.id);
   for (const [k, a] of await getEntities<ArtistDoc>("artists", topKeys)) if (needs(a)) candidates.set(k, a);

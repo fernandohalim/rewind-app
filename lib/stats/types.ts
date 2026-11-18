@@ -1,3 +1,5 @@
+import type { Habits } from "@/lib/plays/types";
+import type { SkipArtist, SkipMonth } from "./habits";
 import type { Discovery, Diversity, Era, GenreMonth, SeriesEntry } from "./taste";
 
 /** Ranked entry: id is a trackId or artistKey. */
@@ -37,6 +39,11 @@ export type AllTimeDoc = YearDoc & {
   discovery: Discovery[];
   recentDiscoveries: { key: string; count: number; firstMonth: string }[];
   tagCoverage: number; // share of all minutes from artists with genres
+  // Level 3 (habits, mostly from the export)
+  habits?: Habits;
+  skipByMonth?: SkipMonth[];
+  mostSkipped?: SkipArtist[];
+  neverSkipped?: SkipArtist[];
   rolledUpAt: number;
 };
 

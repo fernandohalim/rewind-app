@@ -8,10 +8,23 @@ export type Play = {
   msPlayed: number;
   msEst?: boolean; // msPlayed estimated from gaps (API plays)
   skipped?: boolean | "est";
+  reasonStart?: string;
   reasonEnd?: string;
   shuffle?: boolean;
-  platform?: string;
+  platform?: string; // normalized bucket, e.g. "Android", "iOS", "Windows"
   src: "api" | "export";
+};
+
+/** Listening habits, counted over every play (not just streams). */
+export type Habits = {
+  plays: number;
+  skipped: number; // real skip flags (export)
+  skippedEst: number; // estimated partial plays (live logger)
+  shuffleOn: number;
+  shuffleOff: number;
+  platforms: Record<string, number>;
+  starts: Record<string, number>; // reason_start
+  ends: Record<string, number>; // reason_end
 };
 
 export type DayDoc = {
@@ -33,6 +46,8 @@ export type MonthDoc = {
   heat: Record<string, number>; // "dow_hour" -> streams
   days: Record<string, DayTotals>;
   skips: Record<string, number>; // artistKey -> skipped plays
+  artistPlays?: Record<string, number>; // artistKey -> every play (for skip rates)
+  habits?: Habits;
   totals: { count: number; ms: number; plays: number; skips: number };
 };
 

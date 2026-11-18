@@ -1,6 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { dayKey, heatKey, monthOf } from "@/lib/time";
-import { isStream, type MonthDoc, type Play } from "@/lib/plays/types";
+import { isStream, type Habits, type MonthDoc, type Play } from "@/lib/plays/types";
 
 type Sums = Omit<MonthDoc, "month">;
 
@@ -12,7 +12,20 @@ const emptySums = (): Sums => ({
   heat: {},
   days: {},
   skips: {},
+  artistPlays: {},
+  habits: emptyHabits(),
   totals: { count: 0, ms: 0, plays: 0, skips: 0 },
+});
+
+export const emptyHabits = (): Habits => ({
+  plays: 0,
+  skipped: 0,
+  skippedEst: 0,
+  shuffleOn: 0,
+  shuffleOff: 0,
+  platforms: {},
+  starts: {},
+  ends: {},
 });
 
 const add = (m: Record<string, number>, k: string, v: number) => {
@@ -30,6 +43,16 @@ export function sumPlays(plays: Play[]): Sums {
     s.totals.plays += 1;
     add(s.trackMs, p.trackId, p.msPlayed);
     add(s.artistMs, p.artistKey, p.msPlayed);
+    add(s.artistPlays!, p.artistKey, 1);
+    const h = s.habits!;
+    h.plays += 1;
+    if (p.skipped === true) h.skipped += 1;
+    if (p.skipped === "est") h.skippedEst += 1;
+    if (p.shuffle === true) h.shuffleOn += 1;
+    if (p.shuffle === false) h.shuffleOff += 1;
+    if (p.platform) add(h.platforms, p.platform, 1);
+    if (p.reasonStart) add(h.starts, p.reasonStart, 1);
+    if (p.reasonEnd) add(h.ends, p.reasonEnd, 1);
     if (p.skipped) {
       add(s.skips, p.artistKey, 1);
       s.totals.skips += 1;
@@ -67,6 +90,17 @@ export function incrementsFor(month: string, plays: Play[]) {
     artistMs: inc(s.artistMs),
     heat: inc(s.heat),
     skips: inc(s.skips),
+    artistPlays: inc(s.artistPlays!),
+    habits: {
+      plays: FieldValue.increment(s.habits!.plays),
+      skipped: FieldValue.increment(s.habits!.skipped),
+      skippedEst: FieldValue.increment(s.habits!.skippedEst),
+      shuffleOn: FieldValue.increment(s.habits!.shuffleOn),
+      shuffleOff: FieldValue.increment(s.habits!.shuffleOff),
+      platforms: inc(s.habits!.platforms),
+      starts: inc(s.habits!.starts),
+      ends: inc(s.habits!.ends),
+    },
     days: Object.fromEntries(
       Object.entries(s.days).map(([d, t]) => [
         d,
