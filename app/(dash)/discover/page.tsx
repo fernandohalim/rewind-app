@@ -2,9 +2,10 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { StackedBars } from "@/components/charts/stacked-bars";
-import { Floater, Headphones, LoadingTape, Note, Sparkle } from "@/components/decor";
-import { EmptyState, PageHero, SectionTitle } from "@/components/page-hero";
-import { SpotifyIcon } from "@/components/spotify";
+import { Cover } from "@/components/cover";
+import { Floater, Headphones, LoadingTape, Note, Sparkle, Vinyl } from "@/components/decor";
+import { CardHeader, EmptyState, PageBody, PageHero, Section } from "@/components/page-hero";
+import { SpotifyLink } from "@/components/spotify";
 import { CATEGORICAL } from "@/lib/chart-colors";
 import { getEntities, type ArtistDoc } from "@/lib/entities";
 import { lastfmEnabled } from "@/lib/enrich/lastfm";
@@ -45,9 +46,11 @@ async function DiscoverContent() {
   const allTime = await getAllTime();
   if (!allTime) {
     return (
-      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
-        <EmptyState title="Nothing discovered yet">Discoveries appear after the first nightly rollup.</EmptyState>
-      </div>
+      <PageBody>
+        <EmptyState title="Nothing discovered yet" icon={<Headphones className="w-20" />}>
+          Discoveries appear after the first nightly rollup.
+        </EmptyState>
+      </PageBody>
     );
   }
 
@@ -59,12 +62,9 @@ async function DiscoverContent() {
   const discovery = allTime.discovery ?? [];
 
   return (
-    <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
-      <section className="tile relative p-5 sm:p-7">
-        <h2 className="font-display text-2xl font-bold">New artists per month</h2>
-        <p className="mt-1 text-sm text-ink-soft">
-          &ldquo;Stuck&rdquo; means 3+ streams in the 3 months after you first heard them.
-        </p>
+    <PageBody>
+      <section className="tile relative p-5 sm:p-6">
+        <CardHeader title="New artists per month" note={<>&ldquo;Stuck&rdquo; means 3+ streams in the 3 months after you first heard them.</>} />
         <div className="mt-5">
           <StackedBars
             series={[
@@ -81,30 +81,23 @@ async function DiscoverContent() {
         </div>
       </section>
 
-      <section className="mt-16">
-        <SectionTitle>Recent discoveries</SectionTitle>
-        <p className="mt-4 text-ink-soft">First heard in the last 3 months, most-played first.</p>
+      <Section title="Recent discoveries" description="First heard in the last 3 months, most-played first.">
         {recent.length ? (
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {recent.slice(0, 12).map((r, i) => {
               const a = recentDocs.get(r.key);
               return (
                 <li key={r.key} className="rise" style={{ ["--d" as string]: `${i * 40}ms` }}>
-                  <Link href={`/artist/${encodeURIComponent(r.key)}`} className="tile tile-hover flex items-center gap-3 p-3">
-                    {a?.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={a.image} alt="" className="h-12 w-12 rounded-full object-cover" />
-                    ) : (
-                      <span className="h-12 w-12 rounded-full bg-paper-deep" />
-                    )}
+                  <Link href={`/artist/${encodeURIComponent(r.key)}`} className="tile tile-hover flex h-full items-center gap-3 p-4">
+                    <Cover src={a?.image} round className="h-12 w-12" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold">{a?.name ?? r.key}</p>
-                      <p className="text-xs text-ink-soft">
+                      <p className="truncate text-xs text-ink-soft">
                         Since {monthLabel(r.firstMonth)} · {r.count} streams
                       </p>
                     </div>
                     {i < 3 && (
-                      <span className="wiggle-hover rounded-full bg-mustard px-2 py-0.5 text-xs font-bold" style={{ rotate: "4deg" }}>
+                      <span className="wiggle-hover shrink-0 rounded-full bg-mustard px-2 py-0.5 text-xs font-bold text-ink" style={{ rotate: "4deg" }}>
                         hot
                       </span>
                     )}
@@ -114,19 +107,18 @@ async function DiscoverContent() {
             })}
           </ul>
         ) : (
-          <div className="mt-6">
-            <EmptyState title="No new faces lately">Nobody new in the last 3 months. Time for a deep dive?</EmptyState>
-          </div>
+          <EmptyState title="No new faces lately" icon={<Headphones className="w-20" />}>
+            Nobody new in the last 3 months. Time for a deep dive?
+          </EmptyState>
         )}
-      </section>
+      </Section>
 
-      <section className="mt-16">
-        <SectionTitle>Similar to your favourites, never played</SectionTitle>
-        <p className="mt-4 max-w-xl text-ink-soft">
-          Last.fm&apos;s similar artists for your top 20, minus everyone you&apos;ve already played.
-        </p>
+      <Section
+        title="Similar to your favourites, never played"
+        description="Last.fm's similar artists for your top 20, minus everyone you've already played."
+      >
         {similar.length ? (
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {similar.map((s, i) => (
               <li key={s.name} className="rise tile tile-hover relative flex items-center gap-3 p-4" style={{ ["--d" as string]: `${i * 40}ms` }}>
                 {i === 0 && <Sparkle className="twinkle absolute -right-1 -top-1 w-5" fill="#E9B44C" />}
@@ -141,30 +133,19 @@ async function DiscoverContent() {
                   <p className="truncate font-semibold">{s.name}</p>
                   <p className="truncate text-xs text-ink-soft">Because you like {s.because.slice(0, 2).join(" & ")}</p>
                 </div>
-                <a
-                  href={`https://open.spotify.com/search/${encodeURIComponent(s.name)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  title={`Find ${s.name} on Spotify`}
-                  aria-label={`Find ${s.name} on Spotify`}
-                  className="grid h-9 w-9 place-items-center rounded-full transition hover:scale-110"
-                >
-                  <SpotifyIcon />
-                </a>
+                <SpotifyLink href={`https://open.spotify.com/search/${encodeURIComponent(s.name)}`} label={`Find ${s.name} on Spotify`} />
               </li>
             ))}
           </ul>
         ) : (
-          <div className="mt-6">
-            <EmptyState title={lastfmEnabled() ? "Still looking" : "Needs a Last.fm key"}>
-              {lastfmEnabled()
-                ? "Suggestions appear once your top artists have been enriched (a few dozen a day)."
-                : "Set LASTFM_API_KEY to get similar-artist suggestions."}
-            </EmptyState>
-          </div>
+          <EmptyState title={lastfmEnabled() ? "Still looking" : "Needs a Last.fm key"} icon={<Vinyl className="spin-slow w-16" />}>
+            {lastfmEnabled()
+              ? "Suggestions appear once your top artists have been enriched (a few dozen a day)."
+              : "Set LASTFM_API_KEY to get similar-artist suggestions."}
+          </EmptyState>
         )}
-      </section>
-    </div>
+      </Section>
+    </PageBody>
   );
 }
 

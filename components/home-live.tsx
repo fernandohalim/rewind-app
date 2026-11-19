@@ -55,14 +55,14 @@ function Tile({
   children: ReactNode;
 }) {
   return (
-    <article className="rise tile tile-hover relative p-6" style={{ ["--d" as string]: `${delay}ms` }}>
+    <article className="rise tile tile-hover relative p-5 sm:p-6" style={{ ["--d" as string]: `${delay}ms` }}>
       <div className="flex items-start justify-between">
         <IconBadge from={from} to={to}>{icon}</IconBadge>
         <span className="wiggle-hover rounded-full bg-[#BFE3DF] px-2.5 py-1 text-xs font-bold text-ink" style={{ rotate: "-3deg" }}>
           {badge}
         </span>
       </div>
-      <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
+      <p className="eyebrow mt-5">{label}</p>
       {children}
     </article>
   );
@@ -127,9 +127,9 @@ export function TilesSkeleton() {
   return (
     <>
       {[0, 1, 2].map((i) => (
-        <div key={i} className="tile h-[212px] animate-pulse p-6">
+        <div key={i} className="tile h-[200px] animate-pulse p-5 sm:p-6">
           <div className="h-16 w-16 rounded-full bg-paper-deep" />
-          <div className="mt-6 h-4 w-32 rounded-full bg-paper-deep" />
+          <div className="mt-5 h-4 w-32 rounded-full bg-paper-deep" />
           <div className="mt-3 h-10 w-24 rounded-full bg-paper-deep" />
         </div>
       ))}
@@ -144,12 +144,12 @@ export async function NowTop5() {
   const tracks = lists?.tracks.short_term.slice(0, 5) ?? [];
   if (!tracks.length) return <p className="text-ink-soft">Couldn&apos;t reach Spotify right now.</p>;
   return (
-    <ol className="grid gap-3 sm:grid-cols-5">
+    <ol className="scroll-row -mx-4 -my-4 flex snap-x snap-mandatory gap-3 px-4 py-4 sm:mx-0 sm:my-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:p-0">
       {tracks.map((t, i) => (
-        <li key={t.id} className="rise tile tile-hover group relative overflow-hidden p-3" style={{ ["--d" as string]: `${i * 70}ms` }}>
+        <li key={t.id} className="rise tile tile-hover group relative w-40 shrink-0 snap-start overflow-hidden p-3 sm:w-auto" style={{ ["--d" as string]: `${i * 70}ms` }}>
           <Link href={`/track/${t.id}`} className="relative block">
             <Cover src={t.image} vt={vtName("track", t.id)} className="aspect-square w-full !rounded-2xl shadow transition-transform duration-500 group-hover:rotate-[-3deg] group-hover:scale-[1.03]" />
-            <span className="font-display absolute -left-1 -top-1 grid h-10 w-10 place-items-center rounded-full bg-vermilion text-xl font-bold text-ink shadow">
+            <span className="font-display absolute left-1.5 top-1.5 grid h-9 w-9 place-items-center rounded-full bg-vermilion text-lg font-bold text-ink shadow">
               {i + 1}
             </span>
           </Link>
@@ -194,7 +194,7 @@ export async function JobsStatus() {
   await connection();
   const { status, now } = await loadJobStatus();
   return (
-    <ul className="grid gap-3 sm:grid-cols-4">
+    <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {JOBS.map((j) => {
         const s = status?.[j.key];
         const state = !s ? "never" : !s.ok ? "failed" : now - s.at > j.staleAfterMs ? "late" : "ok";
@@ -259,17 +259,12 @@ export async function ThisDayYearsAgo() {
   }
   const thisYear = Number(todayKey().slice(0, 4));
   return (
-    <ul className="grid gap-4 sm:grid-cols-3">
+    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {result.map((r) => (
         <li key={r.year} className="rise tile tile-hover flex items-center gap-3 p-4">
-          {r.track?.album?.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={r.track.album.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
-          ) : (
-            <span className="h-14 w-14 rounded-xl bg-paper-deep" />
-          )}
+          <Cover src={r.track?.album?.image} className="h-14 w-14" />
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-wide text-vermilion-deep">
+            <p className="eyebrow !text-vermilion-deep">
               {thisYear - Number(r.year)} {thisYear - Number(r.year) === 1 ? "year" : "years"} ago
             </p>
             <p className="truncate font-semibold">{r.track?.name ?? "Unknown track"}</p>

@@ -20,16 +20,13 @@ export default async function DashLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex flex-1 flex-col">
       {children}
-      <footer className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-4 pb-10 pt-4 text-sm text-ink-soft">
+      <footer className="mx-auto flex w-full max-w-5xl flex-col-reverse items-start gap-4 border-t border-ink/10 px-4 pb-10 pt-6 text-sm text-ink-soft sm:flex-row sm:items-center sm:justify-between">
         <p>Rewind · data from Spotify, MusicBrainz and Last.fm. Times in Asia/Jakarta.</p>
         <div className="flex items-center gap-2">
           <Link href="/import" className="rounded-full bg-paper-deep px-4 py-2 font-semibold text-ink transition hover:-translate-y-0.5">
             Import history
           </Link>
           <InstallButton />
-          <form action="/api/auth/logout" method="post" className="sm:hidden">
-            <button className="rounded-full bg-paper-deep px-4 py-2 font-semibold text-ink">Log out</button>
-          </form>
         </div>
       </footer>
     </div>

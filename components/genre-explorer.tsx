@@ -60,7 +60,7 @@ export function GenreExplorer({
   const labelEvery = Math.max(1, Math.ceil(n / 10));
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+    <div className="grid items-start gap-4 sm:gap-6 lg:grid-cols-[1fr_300px]">
       <div className="tile p-5 sm:p-6">
         <ul className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-soft" aria-label="Legend">
           {order.map((g) => (
@@ -70,7 +70,8 @@ export function GenreExplorer({
             </li>
           ))}
         </ul>
-        <div className="relative">
+        <div className="chart-scroll -mx-1 px-1">
+          <div className="relative">
           <svg
             viewBox={`0 0 ${W} ${H}`}
             className="h-auto w-full"
@@ -103,6 +104,7 @@ export function GenreExplorer({
             <line x1={x(show)} x2={x(show)} y1={PAD.t} y2={H - PAD.b} stroke="#1B1A17" strokeWidth={2} />
             <circle cx={x(show)} cy={PAD.t} r={5} fill="#1B1A17" />
           </svg>
+          </div>
         </div>
         <details className="mt-3 text-sm text-ink-soft">
           <summary className="cursor-pointer font-semibold">Show as a table</summary>
@@ -130,7 +132,7 @@ export function GenreExplorer({
       <div className="flex flex-col gap-4">
         <RewindScrubber labels={months.map((m) => monthLabel(m.month))} index={index} onIndex={onIndex} />
         <div className="tile p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{monthLabel(months[show]?.month ?? "")}</p>
+          <p className="eyebrow">{monthLabel(months[show]?.month ?? "")}</p>
           <ul className="mt-3 space-y-2.5">
             {order.map((g, gi) => (
               <li key={g}>

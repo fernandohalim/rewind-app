@@ -3,7 +3,8 @@ import { Suspense, type ReactNode } from "react";
 import { BumpChart, type BumpSeries } from "@/components/charts/bump-chart";
 import { Floater, IconBadge, LoadingTape, Note, Vinyl } from "@/components/decor";
 import { FlameIcon, HeadphonesIcon, ShapesIcon } from "@/components/icons";
-import { EmptyState, PageHero, SectionTitle } from "@/components/page-hero";
+import { EmptyState, PageBody, PageHero, Section } from "@/components/page-hero";
+import { Cover } from "@/components/cover";
 import { SpotifyLink } from "@/components/spotify";
 import { TopBoard, type Movement } from "@/components/top-board";
 import { recentSnapshots, type SnapshotDoc } from "@/lib/snapshots";
@@ -83,9 +84,11 @@ async function TopContent() {
   } catch (err) {
     console.error("[top] Spotify request failed", err);
     return (
-      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
-        <EmptyState title="Spotify didn't answer">Couldn&apos;t load your rankings right now. Try again in a minute.</EmptyState>
-      </div>
+      <PageBody>
+        <EmptyState title="Spotify didn't answer" icon={<Vinyl className="spin-slow w-16" />}>
+          Couldn&apos;t load your rankings right now. Try again in a minute.
+        </EmptyState>
+      </PageBody>
     );
   }
 
@@ -95,14 +98,11 @@ async function TopContent() {
   const ins = insights(lists);
 
   return (
-    <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
-      <section className="relative">
-        <TopBoard lists={lists} movement={movement} since={prev ? dayLabel(prev.date) : null} />
-      </section>
+    <PageBody>
+      <TopBoard lists={lists} movement={movement} since={prev ? dayLabel(prev.date) : null} />
 
-      <section className="mt-16">
-        <SectionTitle>What the rankings say</SectionTitle>
-        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+      <Section title="What the rankings say">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
           <InsightCard
             title="New obsessions"
             body="In your last 4 weeks, but not your last 6 months."
@@ -131,14 +131,11 @@ async function TopContent() {
             delay={200}
           />
         </div>
-      </section>
+      </Section>
 
-      <section className="mt-16">
-        <SectionTitle>Rank movement</SectionTitle>
-        <p className="mt-4 max-w-xl text-ink-soft">Your top 10 artists of the last 4 weeks, one point per daily snapshot.</p>
-        <div className="mt-6">
-          {snaps.length >= 2 ? (
-            <div className="tile p-5 sm:p-7">
+      <Section title="Rank movement" description="Your top 10 artists of the last 4 weeks, one point per daily snapshot.">
+        {snaps.length >= 2 ? (
+            <div className="tile p-5 sm:p-6">
               <BumpChart {...bumpData(snaps, lists)} />
             </div>
           ) : (
@@ -147,9 +144,8 @@ async function TopContent() {
               check back after a couple more to see artists climb and fall.
             </EmptyState>
           )}
-        </div>
-      </section>
-    </div>
+      </Section>
+    </PageBody>
   );
 }
 
@@ -171,27 +167,22 @@ function InsightCard({
   delay: number;
 }) {
   return (
-    <article className="rise tile tile-hover flex flex-col p-6" style={{ ["--d" as string]: `${delay}ms` }}>
+    <article className="rise tile tile-hover flex flex-col p-5 sm:p-6" style={{ ["--d" as string]: `${delay}ms` }}>
       <IconBadge from={from} to={to}>{icon}</IconBadge>
       <h3 className="font-display mt-5 text-2xl font-bold">{title}</h3>
-      <p className="mt-1 text-sm text-ink-soft">{body}</p>
+      <p className="mt-0.5 text-sm text-ink-soft">{body}</p>
       {artists.length ? (
-        <ul className="mt-5 space-y-2">
+        <ul className="mt-4 space-y-2">
           {artists.slice(0, 6).map((a) => (
             <li key={a.id} className="flex items-center gap-3">
-              {a.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={a.image} alt="" className="h-9 w-9 rounded-full object-cover" />
-              ) : (
-                <span className="h-9 w-9 rounded-full bg-paper-deep" />
-              )}
+              <Cover src={a.image} round className="h-9 w-9" />
               <span className="min-w-0 flex-1 truncate font-semibold">{a.name}</span>
               <SpotifyLink href={a.url} />
             </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-5 text-sm font-semibold text-ink-soft">Nobody here right now.</p>
+        <p className="mt-4 text-sm text-ink-soft">Nobody here right now.</p>
       )}
     </article>
   );

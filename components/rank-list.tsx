@@ -55,14 +55,3 @@ export function RankList({
   );
 }
 
-export function StatTile({ label, value, unit, delay = 0 }: { label: string; value: string; unit?: string; delay?: number }) {
-  return (
-    <div className="rise tile p-5" style={{ ["--d" as string]: `${delay}ms` }}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
-      <p className="font-display tabular mt-1 text-4xl font-bold">
-        {value}
-        {unit && <span className="ml-1 text-xl text-ink-soft">{unit}</span>}
-      </p>
-    </div>
-  );
-}

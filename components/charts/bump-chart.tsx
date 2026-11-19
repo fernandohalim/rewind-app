@@ -65,6 +65,7 @@ export function BumpChart({ dates, series, maxRank = 10 }: { dates: string[]; se
         )}
       </ul>
 
+      <div className="chart-scroll">
       <div className="relative">
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Artist rank over time">
           {Array.from({ length: maxRank }, (_, k) => k + 1).map((r) => (
@@ -139,6 +140,7 @@ export function BumpChart({ dates, series, maxRank = 10 }: { dates: string[]; se
             </div>
           );
         })()}
+      </div>
       </div>
 
       <details className="mt-3 text-sm text-ink-soft">

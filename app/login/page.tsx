@@ -41,7 +41,7 @@ export default function LoginPage() {
   return (
     <main className="flex flex-1 flex-col">
       {/* Hero */}
-      <section className="bg-sunset relative isolate overflow-hidden px-4 pb-40 pt-6 text-white sm:pb-48">
+      <section className="bg-sunset relative isolate overflow-hidden px-4 pb-32 pt-4 text-white sm:pb-48 sm:pt-6">
         <div className="blob -left-24 top-10 h-72 w-72 bg-[#4A90C2]" />
         <div className="blob -right-20 top-40 h-80 w-80 bg-[#E9B44C]" />
         <div className="blob left-1/3 -top-24 h-64 w-64 bg-[#D9667E]" />
@@ -52,26 +52,26 @@ export default function LoginPage() {
         </nav>
 
         {/* Floating bits */}
-        <Floater className="left-[4%] top-28 w-24 sm:left-[10%] sm:w-36" rotate={-12}>
+        <Floater className="left-[4%] top-24 w-[4.5rem] sm:left-[10%] sm:top-28 sm:w-36" rotate={-12}>
           <Cassette />
         </Floater>
-        <Floater className="right-[4%] top-24 w-20 sm:right-[12%] sm:w-32" variant="b" delay={0.8}>
+        <Floater className="right-[5%] top-[4.75rem] w-16 sm:right-[12%] sm:top-24 sm:w-32" variant="b" delay={0.8}>
           <div className="spin-slow"><Vinyl label="#E9B44C" /></div>
         </Floater>
         <Floater className="bottom-36 left-[14%] hidden w-28 sm:block" rotate={10} variant="b" delay={1.4}>
           <Headphones />
         </Floater>
-        <Floater className="bottom-44 right-[16%] w-10 sm:w-14" rotate={-8} delay={0.4}>
+        <Floater className="bottom-44 right-[16%] hidden w-14 sm:block" rotate={-8} delay={0.4}>
           <Note />
         </Floater>
         <Floater className="right-[30%] top-24 hidden w-8 sm:block" rotate={14} variant="b" delay={2}>
           <Note fill="#2E7D7A" />
         </Floater>
-        <Sparkle className="twinkle absolute left-[28%] top-36 w-5" />
+        <Sparkle className="twinkle absolute left-[28%] top-36 hidden w-5 sm:block" />
         <Sparkle className="twinkle absolute right-[24%] top-[55%] w-4" style={{ animationDelay: "1s" }} fill="#E9B44C" />
-        <Sparkle className="twinkle absolute left-[8%] top-[62%] w-6" style={{ animationDelay: "1.8s" }} />
+        <Sparkle className="twinkle absolute left-[8%] top-[62%] hidden w-6 sm:block" style={{ animationDelay: "1.8s" }} />
 
-        <div className="relative z-10 mx-auto mt-24 flex max-w-2xl flex-col items-center text-center sm:mt-28">
+        <div className="relative z-10 mx-auto mt-28 flex max-w-2xl flex-col items-center text-center">
           <span
             className="rise wiggle-hover inline-block rounded-full bg-white/20 px-4 py-1.5 text-sm font-semibold ring-1 ring-white/40 backdrop-blur"
             style={{ ["--r" as string]: "-3deg", rotate: "-3deg" }}
@@ -79,7 +79,7 @@ export default function LoginPage() {
             ✦ Wrapped, any day you like
           </span>
           <h1
-            className="rise font-display mt-6 text-6xl font-bold leading-[0.95] tracking-tight drop-shadow-[0_4px_18px_rgba(61,34,102,0.35)] sm:text-8xl"
+            className="rise font-display mt-6 text-[3.25rem] font-bold leading-[0.95] tracking-tight drop-shadow-[0_4px_18px_rgba(61,34,102,0.35)] sm:text-8xl"
             style={{ ["--d" as string]: "80ms" }}
           >
             Your listening,
@@ -87,7 +87,7 @@ export default function LoginPage() {
             played back.
           </h1>
           <p
-            className="rise mt-6 max-w-lg text-lg text-white/90 sm:text-xl"
+            className="rise mt-5 max-w-lg text-base text-white/90 sm:mt-6 sm:text-xl"
             style={{ ["--d" as string]: "160ms" }}
           >
             Rewind turns every song you&apos;ve ever played into stats, streaks and
@@ -95,7 +95,7 @@ export default function LoginPage() {
           </p>
           <a
             href="/api/auth/login"
-            className="rise group mt-10 inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-sm font-bold uppercase tracking-[0.14em] text-plum-deep shadow-[0_16px_32px_-10px_rgba(61,34,102,0.6)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.03] active:scale-95"
+            className="rise group mt-8 inline-flex sm:mt-10 items-center gap-3 rounded-full bg-white px-8 py-4 text-sm font-bold uppercase tracking-[0.14em] text-plum-deep shadow-[0_16px_32px_-10px_rgba(61,34,102,0.6)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.03] active:scale-95"
             style={{ ["--d" as string]: "240ms" }}
           >
             Connect Spotify
@@ -107,21 +107,23 @@ export default function LoginPage() {
       </section>
 
       {/* Features */}
-      <section className="relative mx-auto -mt-16 grid w-full max-w-5xl gap-6 px-4 pb-20 sm:grid-cols-3">
+      <section className="relative mx-auto -mt-16 grid w-full max-w-5xl gap-4 px-4 pb-16 sm:gap-6 md:grid-cols-3 md:pb-20">
         {features.map((f, i) => (
           <article
             key={f.title}
-            className={`rise tile tile-hover p-7 ${i === 1 ? "sm:relative sm:-top-8" : ""}`}
+            className={`rise tile tile-hover flex items-start gap-4 p-5 sm:p-7 md:block ${i === 1 ? "md:relative md:-top-8" : ""}`}
             style={{ ["--d" as string]: `${360 + i * 120}ms` }}
           >
             <IconBadge from={f.from} to={f.to}>{f.icon}</IconBadge>
-            <h2 className="font-display mt-6 text-2xl font-bold">{f.title}</h2>
-            <p className="mt-2 leading-relaxed text-ink-soft">{f.body}</p>
+            <div className="min-w-0 md:mt-6">
+              <h2 className="font-display text-2xl font-bold">{f.title}</h2>
+              <p className="mt-1 leading-relaxed text-ink-soft md:mt-2">{f.body}</p>
+            </div>
           </article>
         ))}
       </section>
 
-      <footer className="pb-10 text-center text-sm text-ink-soft">
+      <footer className="px-4 pb-10 text-center text-sm text-ink-soft">
         Made for one listener. Data from Spotify, MusicBrainz and Last.fm.
       </footer>
     </main>

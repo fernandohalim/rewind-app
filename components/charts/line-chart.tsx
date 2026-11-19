@@ -31,6 +31,7 @@ export function LineChart({ points, unit = "", color = SERIES, highlight }: { po
   const show = hover ?? (hi >= 0 ? hi : null);
 
   return (
+    <div className="chart-scroll">
     <div className="relative">
       <svg
         viewBox={`0 0 ${W} ${H}`}
@@ -83,6 +84,7 @@ export function LineChart({ points, unit = "", color = SERIES, highlight }: { po
           </p>
         </div>
       )}
+    </div>
     </div>
   );
 }

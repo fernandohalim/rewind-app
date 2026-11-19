@@ -71,6 +71,7 @@ body {
 
 /* White tile with a soft, tinted shadow that lifts on hover. */
 @utility tile {
+  min-width: 0; /* let truncated text inside grid/flex tiles shrink instead of overflowing */
   background: var(--card);
   border-radius: 28px;
   box-shadow:
@@ -87,6 +88,46 @@ body {
     box-shadow:
       0 2px 4px rgb(61 34 102 / 0.06),
       0 28px 50px -14px rgb(61 34 102 / 0.28);
+  }
+}
+
+/* Small uppercase label above a stat or inside a card. */
+@utility eyebrow {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+/* Horizontal scroller with hidden scrollbar (chip rows, carousels). */
+@utility scroll-row {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Fades the right edge of a scroller so it reads as "there's more". */
+@utility fade-r {
+  mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+}
+
+/* Wide SVG charts: keep labels readable on phones by letting them scroll. */
+@utility chart-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  & > * {
+    min-width: 600px;
+  }
+  @media (width >= 40rem) {
+    overflow-x: visible;
+    & > * {
+      min-width: 0;
+    }
   }
 }
 

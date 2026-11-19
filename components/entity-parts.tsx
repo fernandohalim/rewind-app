@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 import { CountUp } from "./count-up";
 
+/** Grid for a row of stat tiles: 2 across on phones, 4 from md up. */
+export function StatGrid({ children }: { children: ReactNode }) {
+  return <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">{children}</div>;
+}
+
 /** Big stat tile with a counting number. */
 export function CountTile({
   label,
@@ -16,21 +21,32 @@ export function CountTile({
   delay?: number;
 }) {
   return (
-    <div className="rise tile p-5" style={{ ["--d" as string]: `${delay}ms` }}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
-      <p className="font-display mt-1 text-4xl font-bold">
+    <div className="rise tile min-w-0 p-4 sm:p-5" style={{ ["--d" as string]: `${delay}ms` }}>
+      <p className="eyebrow truncate">{label}</p>
+      <p className="font-display tabular mt-1 truncate text-3xl font-bold sm:text-4xl">
         <CountUp value={value} decimals={decimals} />
-        {unit && <span className="ml-1 text-xl text-ink-soft">{unit}</span>}
+        {unit && <span className="ml-1 text-lg text-ink-soft sm:text-xl">{unit}</span>}
       </p>
     </div>
   );
 }
 
-export function TextTile({ label, children, delay = 0 }: { label: string; children: ReactNode; delay?: number }) {
+export function TextTile({
+  label,
+  children,
+  note,
+  delay = 0,
+}: {
+  label: string;
+  children: ReactNode;
+  note?: ReactNode;
+  delay?: number;
+}) {
   return (
-    <div className="rise tile p-5" style={{ ["--d" as string]: `${delay}ms` }}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
-      <p className="font-display mt-1 text-2xl font-bold">{children}</p>
+    <div className="rise tile min-w-0 p-4 sm:p-5" style={{ ["--d" as string]: `${delay}ms` }}>
+      <p className="eyebrow truncate">{label}</p>
+      <p className="font-display mt-1 truncate text-2xl font-bold sm:mt-2">{children}</p>
+      {note && <p className="mt-0.5 truncate text-sm text-ink-soft">{note}</p>}
     </div>
   );
 }

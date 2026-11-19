@@ -5,7 +5,8 @@ import { Heatmap } from "@/components/charts/heatmap";
 import { MonthBars } from "@/components/charts/month-bars";
 import { Floater, Headphones, IconBadge, LoadingTape, Note } from "@/components/decor";
 import { ClockIcon, FlameIcon } from "@/components/icons";
-import { EmptyState, PageHero, SectionTitle } from "@/components/page-hero";
+import { CardHeader, EmptyState, PageBody, PageHero, Section } from "@/components/page-hero";
+import { Cover } from "@/components/cover";
 import { SpotifyLink } from "@/components/spotify";
 import { getEntities, type TrackDoc } from "@/lib/entities";
 import { getAllTime, hours } from "@/lib/stats/read";
@@ -43,11 +44,11 @@ async function TimeContent() {
   const allTime = await getAllTime();
   if (!allTime) {
     return (
-      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
+      <PageBody>
         <EmptyState title="The clock hasn't started" icon={<Headphones className="w-20" />}>
           Your listening clock fills in after the first nightly rollup.
         </EmptyState>
-      </div>
+      </PageBody>
     );
   }
 
@@ -56,18 +57,16 @@ async function TimeContent() {
   const { longest, current } = allTime.streaks;
 
   return (
-    <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
-      <section className="tile relative p-5 sm:p-7">
-        <h2 className="font-display text-2xl font-bold">Hour × weekday</h2>
-        <p className="mt-1 text-sm text-ink-soft">Every stream, by when it ended (Jakarta time).</p>
+    <PageBody>
+      <section className="tile relative p-5 sm:p-6">
+        <CardHeader title="Hour × weekday" note="Every stream, by when it ended (Jakarta time)." />
         <div className="mt-5">
           <Heatmap heat={allTime.heat ?? {}} />
         </div>
       </section>
 
-      <section className="mt-12">
-        <SectionTitle>Listening by month</SectionTitle>
-        <div className="tile mt-6 p-5 sm:p-7">
+      <Section title="Listening by month">
+        <div className="tile p-5 sm:p-6">
           <MonthBars
             bars={allTime.months.map((m) => ({
               key: m.month,
@@ -77,55 +76,47 @@ async function TimeContent() {
             }))}
           />
         </div>
-      </section>
+      </Section>
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-2">
-        <section className="rise tile p-6">
-          <div className="flex items-center gap-4">
-            <IconBadge from="#E9B44C" to="#E4572E"><FlameIcon /></IconBadge>
-            <div>
-              <h2 className="font-display text-2xl font-bold">Streaks</h2>
-              <p className="text-sm text-ink-soft">Days in a row with at least one stream.</p>
-            </div>
-          </div>
-          <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-ink-soft">Running now</p>
+      <Section title="Streaks & binges">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <section className="rise tile p-5 sm:p-6">
+          <CardHeader
+            icon={<IconBadge from="#E9B44C" to="#E4572E"><FlameIcon /></IconBadge>}
+            title="Streaks"
+            note="Days in a row with at least one stream."
+          />
+          <p className="eyebrow mt-6">Running now</p>
           <p className="font-display tabular text-5xl font-bold text-vermilion">
             {current?.days ?? 0}
             <span className="ml-2 text-2xl text-ink-soft">days</span>
           </p>
           <ol className="mt-6 space-y-2">
             {longest.map((s, i) => (
-              <li key={s.start} className="flex items-center justify-between gap-3 rounded-2xl bg-paper px-4 py-2.5">
-                <span className="font-semibold">
+              <li key={s.start} className="flex items-center justify-between gap-3 rounded-2xl bg-paper px-3 py-2.5 sm:px-4">
+                <span className="min-w-0 text-sm font-semibold sm:text-base">
                   {i === 0 && <span className="mr-2" aria-hidden>🏆</span>}
                   {dayLabel(s.start)} – {dayLabel(s.end)}
                 </span>
-                <span className="tabular font-bold">{s.days} d</span>
+                <span className="tabular shrink-0 font-bold">{s.days} d</span>
               </li>
             ))}
             {!longest.length && <li className="text-sm text-ink-soft">No streaks yet.</li>}
           </ol>
         </section>
 
-        <section className="rise tile p-6" style={{ ["--d" as string]: "100ms" }}>
-          <div className="flex items-center gap-4">
-            <IconBadge from="#7B4B94" to="#D9667E"><ClockIcon /></IconBadge>
-            <div>
-              <h2 className="font-display text-2xl font-bold">Binge sessions</h2>
-              <p className="text-sm text-ink-soft">The same track 5 or more times in a row.</p>
-            </div>
-          </div>
+        <section className="rise tile p-5 sm:p-6" style={{ ["--d" as string]: "100ms" }}>
+          <CardHeader
+            icon={<IconBadge from="#7B4B94" to="#D9667E"><ClockIcon /></IconBadge>}
+            title="Binge sessions"
+            note="The same track 5 or more times in a row."
+          />
           <ol className="mt-6 space-y-2">
             {binges.slice(0, 8).map((b) => {
               const t = tracks.get(b.trackId);
               return (
                 <li key={`${b.trackId}@${b.start}`} className="flex items-center gap-3 rounded-2xl bg-paper px-3 py-2">
-                  {t?.album?.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={t.album.image} alt="" className="h-10 w-10 rounded-lg object-cover" />
-                  ) : (
-                    <span className="h-10 w-10 rounded-lg bg-paper-deep" />
-                  )}
+                  <Cover src={t?.album?.image} className="h-10 w-10" />
                   <div className="min-w-0 flex-1">
                     <Link href={`/track/${b.trackId}`} className="block truncate font-semibold hover:underline">
                       {t?.name ?? "Unknown track"}
@@ -134,7 +125,7 @@ async function TimeContent() {
                       {t?.artistName} · {dayLabel(dayKey(b.start))}
                     </p>
                   </div>
-                  <span className="wiggle-hover rounded-full bg-mustard px-2.5 py-1 text-sm font-bold" style={{ rotate: "3deg" }}>
+                  <span className="wiggle-hover shrink-0 rounded-full bg-mustard px-2.5 py-1 text-sm font-bold text-ink" style={{ rotate: "3deg" }}>
                     ×{b.count}
                   </span>
                   <SpotifyLink href={t?.url} />
@@ -147,6 +138,7 @@ async function TimeContent() {
           </ol>
         </section>
       </div>
-    </div>
+      </Section>
+    </PageBody>
   );
 }

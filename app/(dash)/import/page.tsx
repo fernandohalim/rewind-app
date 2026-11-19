@@ -1,6 +1,6 @@
 import { Floater, Vinyl } from "@/components/decor";
 import { ImportFlow } from "@/components/import-flow";
-import { PageHero } from "@/components/page-hero";
+import { PageBody, PageHero } from "@/components/page-hero";
 
 export const metadata = { title: "Import · Rewind" };
 
@@ -17,9 +17,9 @@ export default function ImportPage() {
           </Floater>
         }
       />
-      <div className="relative z-10 mx-auto -mt-16 w-full max-w-3xl px-4 pb-20">
+      <PageBody narrow>
         <ImportFlow />
-      </div>
+      </PageBody>
     </main>
   );
 }

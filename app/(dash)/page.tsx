@@ -1,9 +1,7 @@
 import { Suspense } from "react";
 import { Cassette, Floater, LoadingTape, Note, Vinyl } from "@/components/decor";
 import { HelloName, HomeTiles, JobsStatus, NowTop5, ThisDayYearsAgo, TilesSkeleton } from "@/components/home-live";
-import { PageHero, SectionTitle } from "@/components/page-hero";
-
-
+import { PageBody, PageHero, Section } from "@/components/page-hero";
 
 export default function Home() {
   return (
@@ -28,42 +26,35 @@ export default function Home() {
         }
       />
 
-      <section className="relative mx-auto -mt-20 grid w-full max-w-5xl gap-6 px-4 sm:grid-cols-3">
-        <Suspense fallback={<TilesSkeleton />}>
-          <HomeTiles />
-        </Suspense>
-      </section>
+      <PageBody>
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
+          <Suspense fallback={<TilesSkeleton />}>
+            <HomeTiles />
+          </Suspense>
+        </div>
 
-      <section className="mx-auto w-full max-w-5xl px-4 pt-16">
-        <SectionTitle>On repeat lately</SectionTitle>
-        <p className="mt-4 text-ink-soft">Spotify&apos;s top 5 tracks for your last 4 weeks.</p>
-        <div className="mt-6">
+        <Section title="On repeat lately" description="Spotify's top 5 tracks for your last 4 weeks.">
           <Suspense fallback={<LoadingTape label="Fetching your top 5…" />}>
             <NowTop5 />
           </Suspense>
-        </div>
-      </section>
+        </Section>
 
-      <section className="mx-auto w-full max-w-5xl px-4 pt-16">
-        <SectionTitle>This day, years ago</SectionTitle>
-        <div className="mt-6">
+        <Section title="This day, years ago" description="The track you played most on this date in earlier years.">
           <Suspense fallback={<LoadingTape label="Rewinding the years…" />}>
             <ThisDayYearsAgo />
           </Suspense>
-        </div>
-      </section>
+        </Section>
 
-      <section className="mx-auto w-full max-w-5xl px-4 py-16">
-        <SectionTitle aside={<Cassette className="float-a hidden w-28 sm:block" style={{ ["--r" as string]: "8deg" }} />}>
-          Behind the scenes
-        </SectionTitle>
-        <p className="mt-4 text-ink-soft">The little machines that keep your tape rolling.</p>
-        <div className="mt-6">
+        <Section
+          title="Behind the scenes"
+          description="The little machines that keep your tape rolling."
+          aside={<Cassette className="float-a hidden w-28 sm:block" style={{ ["--r" as string]: "8deg" }} />}
+        >
           <Suspense fallback={<div className="tile h-20 animate-pulse" />}>
             <JobsStatus />
           </Suspense>
-        </div>
-      </section>
+        </Section>
+      </PageBody>
     </main>
   );
 }

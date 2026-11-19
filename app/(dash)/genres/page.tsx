@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { LineChart } from "@/components/charts/line-chart";
 import { Floater, LoadingTape, Note, Sparkle, Vinyl } from "@/components/decor";
 import { GenreExplorer } from "@/components/genre-explorer";
-import { EmptyState, PageHero, SectionTitle } from "@/components/page-hero";
+import { EmptyState, PageBody, PageHero, Section } from "@/components/page-hero";
 import { CATEGORICAL, OTHER } from "@/lib/chart-colors";
 import { getAllTime } from "@/lib/stats/read";
 import { monthLabel } from "@/lib/time";
@@ -44,12 +44,12 @@ async function GenresContent() {
 
   if (!allTime || !months.length) {
     return (
-      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-16">
+      <PageBody>
         <EmptyState title="Genres are on their way" icon={<Vinyl className="spin-slow w-16" />}>
           Rewind looks up a few dozen of your artists every day on MusicBrainz and Last.fm. Your genre chart appears after
           the next nightly rollup once some are tagged.
         </EmptyState>
-      </div>
+      </PageBody>
     );
   }
 
@@ -57,23 +57,21 @@ async function GenresContent() {
   const eras = [...allTime.eras].reverse();
 
   return (
-    <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
+    <PageBody>
       <GenreExplorer genres={allTime.topGenres} months={months} diversity={allTime.diversity} />
-      <p className="mt-3 text-xs text-ink-soft">
+      <p className="mt-3 px-1 text-xs text-ink-soft">
         Each artist&apos;s minutes count toward their main genre. {Math.round(allTime.tagCoverage * 100)}% of your listening
         comes from artists with genres so far; the rest fills in as enrichment runs.
       </p>
 
-      <section className="mt-16">
-        <SectionTitle>Eras</SectionTitle>
-        <p className="mt-4 max-w-xl text-ink-soft">Stretches of 2+ months where one genre led your listening.</p>
+      <Section title="Eras" description="Stretches of 2+ months where one genre led your listening.">
         {eras.length ? (
-          <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {eras.map((e, i) => (
               <li key={`${e.genre}-${e.start}`} className="rise tile tile-hover relative overflow-hidden p-5" style={{ ["--d" as string]: `${i * 70}ms` }}>
                 <span className="absolute inset-x-0 top-0 h-2" style={{ background: colorOf(e.genre) }} />
                 <Sparkle className="twinkle absolute right-4 top-5 w-4" fill={colorOf(e.genre)} />
-                <p className="text-xs font-bold uppercase tracking-wide text-ink-soft">
+                <p className="eyebrow pr-6">
                   {monthLabel(e.start)} – {monthLabel(e.end)}
                 </p>
                 <p className="font-display mt-2 text-2xl font-bold">The {title(e.genre)} era</p>
@@ -84,19 +82,17 @@ async function GenresContent() {
             ))}
           </ol>
         ) : (
-          <div className="mt-6">
-            <EmptyState title="No eras yet">An era needs at least two months led by the same genre. Keep listening.</EmptyState>
-          </div>
+          <EmptyState title="No eras yet" icon={<Vinyl className="spin-slow w-16" />}>
+            An era needs at least two months led by the same genre. Keep listening.
+          </EmptyState>
         )}
-      </section>
+      </Section>
 
-      <section className="mt-16">
-        <SectionTitle>Diversity</SectionTitle>
-        <p className="mt-4 max-w-xl text-ink-soft">
-          How spread out your listening is each month, as the number of equally-played artists it&apos;s worth. Higher
-          means more variety.
-        </p>
-        <div className="tile mt-6 p-5 sm:p-7">
+      <Section
+        title="Diversity"
+        description="How spread out your listening is each month, as the number of equally-played artists it's worth. Higher means more variety."
+      >
+        <div className="tile p-5 sm:p-6">
           <LineChart
             unit="artists"
             color={CATEGORICAL[1]}
@@ -108,7 +104,7 @@ async function GenresContent() {
             }))}
           />
         </div>
-      </section>
-    </div>
+      </Section>
+    </PageBody>
   );
 }

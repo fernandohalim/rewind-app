@@ -22,6 +22,7 @@ export function MonthBars({ bars, unit = "h", decimals = 1 }: { bars: Bar[]; uni
 
   return (
     <div>
+      <div className="chart-scroll">
       <div className="relative">
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Listening hours per month">
           {[0, 0.5, 1].map((f) => (
@@ -73,6 +74,7 @@ export function MonthBars({ bars, unit = "h", decimals = 1 }: { bars: Bar[]; uni
             </p>
           </div>
         )}
+      </div>
       </div>
       <details className="mt-3 text-sm text-ink-soft">
         <summary className="cursor-pointer font-semibold">Show as a table</summary>

@@ -178,7 +178,7 @@ export function ImportFlow() {
             setDragOver(false);
             onFiles(e.dataTransfer.files);
           }}
-          className={`tile flex flex-col items-center gap-4 border-4 border-dashed p-10 text-center transition ${
+          className={`tile flex flex-col items-center gap-4 border-4 border-dashed p-6 sm:p-10 text-center transition ${
             dragOver ? "scale-[1.01] border-vermilion bg-[#FFF3EC]" : "border-transparent"
           }`}
         >
@@ -214,14 +214,14 @@ export function ImportFlow() {
       )}
 
       {phase.kind === "reading" && (
-        <div className="tile flex flex-col items-center gap-3 p-10">
+        <div className="tile flex flex-col items-center gap-3 p-6 sm:p-10">
           <Cassette className="float-a w-24" />
           <p className="font-semibold">{phase.note}</p>
         </div>
       )}
 
       {r && data && phase.kind !== "pick" && phase.kind !== "reading" && phase.kind !== "error" && (
-        <section className="tile p-6">
+        <section className="tile p-5 sm:p-6">
           <h2 className="font-display text-2xl font-bold">What&apos;s in your export</h2>
           <p className="mt-1 text-sm text-ink-soft">{fileNames.length} files · {fileNames.slice(0, 3).join(", ")}{fileNames.length > 3 ? "…" : ""}</p>
           <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -239,7 +239,7 @@ export function ImportFlow() {
       )}
 
       {phase.kind === "ready" && data && (
-        <section className="tile p-6">
+        <section className="tile p-5 sm:p-6">
           {resumable && doneDays.size > 0 ? (
             <p className="font-semibold">
               Welcome back: {doneDays.size.toLocaleString("en")} of {data.days.length.toLocaleString("en")} days are already in. Let&apos;s
@@ -271,7 +271,7 @@ export function ImportFlow() {
       )}
 
       {(phase.kind === "uploading" || phase.kind === "paused") && (
-        <section className="tile p-6">
+        <section className="tile p-5 sm:p-6">
           <div className="flex items-center justify-between gap-3">
             <p className="font-display text-xl font-bold">{phase.kind === "paused" ? "Paused for today" : "Uploading…"}</p>
             <p className="tabular text-sm font-semibold text-ink-soft">
@@ -297,16 +297,16 @@ export function ImportFlow() {
       )}
 
       {phase.kind === "finishing" && (
-        <div className="tile flex flex-col items-center gap-3 p-10 text-center">
+        <div className="tile flex flex-col items-center gap-3 p-6 sm:p-10 text-center">
           <Cassette className="float-a w-24" />
           <p className="font-semibold">Rebuilding your months and stats… this can take a minute or two.</p>
         </div>
       )}
 
       {phase.kind === "done" && (
-        <section className="tile relative overflow-hidden p-8 text-center">
+        <section className="tile relative overflow-hidden p-6 text-center sm:p-8">
           <ConfettiBurst fireKey="import-done" />
-          <p className="font-display text-4xl font-bold">Your whole history is in!</p>
+          <p className="font-display text-3xl font-bold sm:text-4xl">Your whole history is in!</p>
           <p className="mt-2 text-ink-soft">
             {dryRun
               ? `Dry run finished: ${phase.months} ${phase.months === 1 ? "month" : "months"} would be rebuilt. Nothing was written.`

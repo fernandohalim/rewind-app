@@ -5,8 +5,8 @@ import { Suspense } from "react";
 import { MonthBars } from "@/components/charts/month-bars";
 import { Cover, vtName } from "@/components/cover";
 import { LoadingTape, Note } from "@/components/decor";
-import { CountTile, quip, TextTile } from "@/components/entity-parts";
-import { EmptyState, PageHero, SectionTitle } from "@/components/page-hero";
+import { CountTile, quip, StatGrid, TextTile } from "@/components/entity-parts";
+import { EmptyState, PageBody, PageHero, Section } from "@/components/page-hero";
 import { SpotifyLink } from "@/components/spotify";
 import { getDb } from "@/lib/firebase/admin";
 import type { TrackDoc } from "@/lib/entities";
@@ -56,7 +56,7 @@ async function TrackContent({ params }: { params: Params }) {
           </>
         }
         decor={
-          <div className="float-a pointer-events-none absolute right-[5%] top-24 hidden sm:block" style={{ ["--r" as string]: "-5deg" }}>
+          <div className="float-a pointer-events-none absolute right-[5%] top-24 hidden lg:block" style={{ ["--r" as string]: "-5deg" }}>
             <div className="relative">
               <Cover src={t.album?.image} vt={vtName("track", id)} className="h-48 w-48 rounded-3xl shadow-2xl ring-8 ring-white/30" />
               <Note className="float-b absolute -bottom-4 -left-6 w-12" />
@@ -65,9 +65,9 @@ async function TrackContent({ params }: { params: Params }) {
         }
       />
 
-      <div className="relative z-10 mx-auto -mt-16 w-full max-w-5xl px-4 pb-20">
-        <div className="tile relative flex items-center gap-3 p-4">
-          <Cover src={t.album?.image} className="h-12 w-12 sm:hidden" />
+      <PageBody>
+        <div className="tile relative flex items-center gap-3 p-3 sm:p-4">
+          <Cover src={t.album?.image} className="h-12 w-12 lg:hidden" />
           <p className="min-w-0 flex-1 truncate text-sm text-ink-soft">
             {t.album?.name ?? "Unknown album"}
             {t.releaseDate ? ` · ${t.releaseDate.slice(0, 4)}` : ""}
@@ -76,17 +76,18 @@ async function TrackContent({ params }: { params: Params }) {
           <SpotifyLink href={t.url ?? `https://open.spotify.com/track/${id}`} />
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="mt-6">
+        <StatGrid>
           <CountTile label="Streams" value={count} />
           <CountTile label="Minutes" value={Math.round(ms / 60000)} unit="min" delay={60} />
           <TextTile label="First streamed" delay={120}>{s ? monthLabel(s.first) : "–"}</TextTile>
           <TextTile label="Last streamed" delay={180}>{s ? monthLabel(s.last) : "–"}</TextTile>
+        </StatGrid>
         </div>
 
         {s ? (
-          <section className="mt-12">
-            <SectionTitle>Streams by month</SectionTitle>
-            <div className="tile mt-6 p-5 sm:p-7">
+          <Section title="Streams by month">
+            <div className="tile p-5 sm:p-6">
               <MonthBars
                 unit="streams"
                 decimals={0}
@@ -98,9 +99,9 @@ async function TrackContent({ params }: { params: Params }) {
                 }))}
               />
             </div>
-          </section>
+          </Section>
         ) : (
-          <div className="mt-12">
+          <div className="mt-14 sm:mt-16">
             <EmptyState title="No timeline yet">
               Timelines are kept for your top 300 tracks by minutes. {hours(ms) > 0 ? "This one isn't there yet." : ""}
             </EmptyState>
@@ -108,19 +109,18 @@ async function TrackContent({ params }: { params: Params }) {
         )}
 
         {binges.length > 0 && (
-          <section className="mt-12">
-            <SectionTitle>On repeat</SectionTitle>
-            <ul className="mt-6 flex flex-wrap gap-3">
+          <Section title="On repeat">
+            <ul className="flex flex-wrap gap-3">
               {binges.map((b) => (
                 <li key={b.start} className="wiggle-hover tile px-4 py-3" style={{ rotate: "-1deg" }}>
-                  <span className="font-display text-2xl font-bold text-vermilion">×{b.count}</span>
+                  <span className="font-display text-2xl font-bold text-vermilion-deep">×{b.count}</span>
                   <span className="ml-2 text-sm text-ink-soft">in a row on {dayLabel(dayKey(b.start))}</span>
                 </li>
               ))}
             </ul>
-          </section>
+          </Section>
         )}
-      </div>
+      </PageBody>
     </main>
   );
 }
